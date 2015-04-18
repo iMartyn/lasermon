@@ -1,6 +1,7 @@
 import serial
 import json
 import csv
+import time
 
 log = open('debug.log','a')
 csvfile = open('cuts.csv', 'a')
@@ -16,8 +17,18 @@ if (usageJson == ""):
 else:
     usageObject = json.loads(usageJson)
 
-ser = serial.Serial('/dev/ttyACM0',9600,timeout=10)
-print("Serial open\n");
+secs = 0
+serialOpen = 0
+while serialOpen == 0:
+    print("Waiting for serial... (waited {0} secs)".format(secs))
+    try:
+        ser = serial.Serial('/dev/ttyACM0',9600,timeout=10)
+        serialOpen = 1
+    except:
+        secs += 10
+        time.sleep(10)
+        
+print("Serial open\n")
 while 1:
     line = ser.readline()
     log.write(line.rstrip('\r\n')+"\n")
